@@ -1,5 +1,7 @@
 # GPS Trigger
 
+<img src="art/gps-trigger-icon.svg" alt="" width="96">
+
 App Android (dalla 15 in poi, compatibile dalla 8) che cambia le impostazioni del telefono quando entri in una zona e le ripristina quando esci.
 
 Per ogni zona puoi impostare:
@@ -18,6 +20,14 @@ Per ogni zona scegli anche:
 La posizione si sceglie su una mappa OpenStreetMap, toccando la mappa o cercando un indirizzo. Non serve nessuna API key.
 
 L'interfaccia è in inglese, e in italiano se il telefono è impostato in italiano.
+
+Il tema chiaro o scuro segue il sistema. Puoi anche sceglierlo dall'icona impostazioni in alto nella lista zone. In tema scuro anche la mappa diventa scura.
+
+L'icona originale è in `art/gps-trigger-icon.svg`. Le versioni Android sono in `app/src/main/res/drawable/ic_launcher_*.xml`:
+
+- sfondo
+- primo piano
+- versione monocromatica per le icone a tema
 
 ## Compilare
 

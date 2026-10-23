@@ -7,6 +7,13 @@
     <string name="inside">Dentro</string>
     <string name="disabled">Disattivata</string>
 
+    <!-- Theme -->
+    <string name="theme_title">Tema</string>
+    <string name="theme_system">Come il sistema</string>
+    <string name="theme_light">Chiaro</string>
+    <string name="theme_dark">Scuro</string>
+    <string name="close">Chiudi</string>
+
     <!-- Setup -->
     <string name="setup_title">Configurazione necessaria</string>
     <string name="perm_location_title">Accesso alla posizione</string>

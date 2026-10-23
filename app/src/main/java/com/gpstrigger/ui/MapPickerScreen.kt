@@ -1,5 +1,7 @@
 package com.gpstrigger.ui
 
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.location.Address
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -50,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -83,6 +86,33 @@ private val DEFAULT_CENTER = GeoPoint(41.9, 12.5)
 private const val MIN_RADIUS = 100f
 private const val MAX_RADIUS = 2000f
 private const val RADIUS_STEP = 50f
+
+/**
+ * Turns the light OpenStreetMap tiles dark: inverts the colours, then rotates the hue by 180°
+ * so water stays blue and parks stay green.
+ */
+private val DarkTilesFilter = ColorMatrixColorFilter(
+    ColorMatrix(
+        floatArrayOf(
+            -1f, 0f, 0f, 0f, 255f,
+            0f, -1f, 0f, 0f, 255f,
+            0f, 0f, -1f, 0f, 255f,
+            0f, 0f, 0f, 1f, 0f,
+        )
+    ).apply {
+        // W3C hue-rotate(180deg) matrix.
+        postConcat(
+            ColorMatrix(
+                floatArrayOf(
+                    -0.574f, 1.430f, 0.144f, 0f, 0f,
+                    0.426f, 0.430f, 0.144f, 0f, 0f,
+                    0.426f, 1.430f, -0.856f, 0f, 0f,
+                    0f, 0f, 0f, 1f, 0f,
+                )
+            )
+        )
+    }
+)
 
 /** A one-shot request to move the camera; identity-compared so the same point can be requested twice. */
 private class CenterRequest(val point: GeoPoint)
@@ -273,6 +303,7 @@ private fun OsmMap(
     val currentOnPointChange by rememberUpdatedState(onPointChange)
     val currentRadius by rememberUpdatedState(radius)
     val circleColor = MaterialTheme.colorScheme.primary
+    val dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
 
     val mapView = remember {
         MapView(context).apply {
@@ -310,6 +341,7 @@ private fun OsmMap(
             })
         }
     }
+    val copyright = remember { CopyrightOverlay(context) }
     val myLocation = remember {
         MyLocationNewOverlay(GpsMyLocationProvider(context), mapView)
     }
@@ -327,7 +359,7 @@ private fun OsmMap(
             }
         })
         // Overlays get touch events top-down, so the tap catcher goes at the bottom.
-        mapView.overlays.addAll(listOf(tapOverlay, circle, myLocation, marker, CopyrightOverlay(context)))
+        mapView.overlays.addAll(listOf(tapOverlay, circle, myLocation, marker, copyright))
         onDispose { mapView.onDetach() }
     }
 
@@ -361,6 +393,8 @@ private fun OsmMap(
         factory = { mapView },
         modifier = modifier,
         update = {
+            mapView.overlayManager.tilesOverlay.setColorFilter(if (dark) DarkTilesFilter else null)
+            copyright.setTextColor(if (dark) android.graphics.Color.LTGRAY else android.graphics.Color.DKGRAY)
             val p = point
             marker.isEnabled = p != null
             circle.isEnabled = p != null

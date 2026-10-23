@@ -16,30 +16,39 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Switch
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.gpstrigger.PermissionState
@@ -47,6 +56,7 @@ import com.gpstrigger.Permissions
 import com.gpstrigger.R
 import com.gpstrigger.data.ALL_DAYS
 import com.gpstrigger.data.RingerSetting
+import com.gpstrigger.data.ThemeMode
 import com.gpstrigger.data.Zone
 import com.gpstrigger.data.ZoneActions
 import com.gpstrigger.geofence.SyncResult
@@ -57,6 +67,8 @@ fun ZoneListScreen(
     zones: List<Zone>,
     activeIds: List<String>,
     syncResult: SyncResult?,
+    themeMode: ThemeMode,
+    onThemeModeChange: (ThemeMode) -> Unit,
     onAdd: () -> Unit,
     onEdit: (Zone) -> Unit,
     onToggle: (Zone, Boolean) -> Unit,
@@ -64,13 +76,23 @@ fun ZoneListScreen(
 ) {
     val context = LocalContext.current
     var permissions by remember { mutableStateOf(Permissions.read(context)) }
+    var showThemeDialog by rememberSaveable { mutableStateOf(false) }
     LifecycleResumeEffect(Unit) {
         permissions = Permissions.read(context)
         onPauseOrDispose { }
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.zones_title)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.zones_title)) },
+                actions = {
+                    IconButton(onClick = { showThemeDialog = true }) {
+                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.theme_title))
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onAdd) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_zone))
@@ -112,6 +134,46 @@ fun ZoneListScreen(
             }
         }
     }
+
+    if (showThemeDialog) {
+        ThemeDialog(
+            selected = themeMode,
+            onSelect = onThemeModeChange,
+            onDismiss = { showThemeDialog = false },
+        )
+    }
+}
+
+@Composable
+private fun ThemeDialog(selected: ThemeMode, onSelect: (ThemeMode) -> Unit, onDismiss: () -> Unit) {
+    val options = listOf(
+        ThemeMode.SYSTEM to R.string.theme_system,
+        ThemeMode.LIGHT to R.string.theme_light,
+        ThemeMode.DARK to R.string.theme_dark,
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.theme_title)) },
+        text = {
+            Column(Modifier.selectableGroup()) {
+                options.forEach { (mode, label) ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(selected = mode == selected, role = Role.RadioButton) { onSelect(mode) }
+                            .padding(vertical = 12.dp),
+                    ) {
+                        RadioButton(selected = mode == selected, onClick = null)
+                        Text(stringResource(label), Modifier.padding(start = 16.dp), style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) }
+        },
+    )
 }
 
 @Composable

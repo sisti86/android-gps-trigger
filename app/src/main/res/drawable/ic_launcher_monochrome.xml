@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single-colour version of the icon for Android 13+ themed icons: pin with the bolt cut out. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="720"
+    android:viewportHeight="720">
+    <group
+        android:translateX="104"
+        android:translateY="104">
+        <path
+            android:pathData="M356 390 C356 405.464 311.228 418 256 418 C200.772 418 156 405.464 156 390 C156 374.536 200.772 362 256 362 C311.228 362 356 374.536 356 390 Z"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="8" />
+        <path
+            android:pathData="M306 390 C306 397.732 283.614 404 256 404 C228.386 404 206 397.732 206 390 C206 382.268 228.386 376 256 376 C283.614 376 306 382.268 306 390 Z"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="8" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M256 385 C210 335 150 255 150 190 C150 131.458 197.458 84 256 84 C314.542 84 362 131.458 362 190 C362 255 302 335 256 385 Z M270 135 L215 215 L255 215 L242 285 L300 195 L260 195 Z" />
+    </group>
+</vector>

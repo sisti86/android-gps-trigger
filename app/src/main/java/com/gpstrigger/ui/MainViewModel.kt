@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.gpstrigger.data.AppSettings
+import com.gpstrigger.data.ThemeMode
 import com.gpstrigger.data.Zone
 import com.gpstrigger.data.ZoneStore
 import com.gpstrigger.engine.ZoneEngine
@@ -16,6 +18,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(private val app: Application) : AndroidViewModel(app) {
     val zones = ZoneStore.zones
     val active = ZoneStore.active
+    val themeMode = AppSettings.themeMode
 
     /** Zone being edited; `null` shows the zone list. */
     var draft by mutableStateOf<Zone?>(null)
@@ -92,6 +95,10 @@ class MainViewModel(private val app: Application) : AndroidViewModel(app) {
     fun simulate(enter: Boolean) {
         val zone = original ?: return
         if (enter) ZoneEngine.enter(app, zone.id, ignoreSchedule = true) else ZoneEngine.exit(app, zone)
+    }
+
+    fun setThemeMode(mode: ThemeMode) {
+        AppSettings.setThemeMode(app, mode)
     }
 
     fun sync() {

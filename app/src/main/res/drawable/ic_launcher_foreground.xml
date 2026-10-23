@@ -1,16 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Foreground of art/gps-trigger-icon.svg. The 480-unit icon tile is centred in a 720-unit
+    viewport (108dp), so it maps to the 72dp visible area of the adaptive icon.
+    VectorDrawable has no blur filter: the drop shadows are faked with offset translucent copies.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
+    android:viewportWidth="720"
+    android:viewportHeight="720">
     <group
-        android:scaleX="2.25"
-        android:scaleY="2.25"
-        android:translateX="27"
-        android:translateY="27">
+        android:translateX="104"
+        android:translateY="104">
+
         <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13c0,-3.87 -3.13,-7 -7,-7zM12,11.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5z" />
+            android:pathData="M406 390 C406 413.196 338.843 432 256 432 C173.157 432 106 413.196 106 390 C106 366.804 173.157 348 256 348 C338.843 348 406 366.804 406 390 Z"
+            android:strokeColor="#52A9E0"
+            android:strokeAlpha="0.4"
+            android:strokeWidth="3" />
+        <path
+            android:pathData="M356 390 C356 405.464 311.228 418 256 418 C200.772 418 156 405.464 156 390 C156 374.536 200.772 362 256 362 C311.228 362 356 374.536 356 390 Z"
+            android:strokeColor="#52A9E0"
+            android:strokeAlpha="0.7"
+            android:strokeWidth="4" />
+        <path
+            android:pathData="M306 390 C306 397.732 283.614 404 256 404 C228.386 404 206 397.732 206 390 C206 382.268 228.386 376 256 376 C283.614 376 306 382.268 306 390 Z"
+            android:strokeColor="#52A9E0"
+            android:strokeWidth="5" />
+
+        <group android:translateY="12">
+            <path
+                android:pathData="M256 385 C210 335 150 255 150 190 C150 131.458 197.458 84 256 84 C314.542 84 362 131.458 362 190 C362 255 302 335 256 385 Z"
+                android:fillColor="#000000"
+                android:fillAlpha="0.12"
+                android:strokeColor="#000000"
+                android:strokeAlpha="0.12"
+                android:strokeWidth="32"
+                android:strokeLineJoin="round" />
+            <path
+                android:pathData="M256 385 C210 335 150 255 150 190 C150 131.458 197.458 84 256 84 C314.542 84 362 131.458 362 190 C362 255 302 335 256 385 Z"
+                android:fillColor="#000000"
+                android:fillAlpha="0.25"
+                android:strokeColor="#000000"
+                android:strokeAlpha="0.25"
+                android:strokeWidth="12"
+                android:strokeLineJoin="round" />
+        </group>
+        <path
+            android:pathData="M256 385 C210 335 150 255 150 190 C150 131.458 197.458 84 256 84 C314.542 84 362 131.458 362 190 C362 255 302 335 256 385 Z"
+            android:strokeWidth="12"
+            android:strokeLineJoin="round">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="150"
+                    android:startY="84"
+                    android:endX="150"
+                    android:endY="385">
+                    <item android:offset="0" android:color="#FFFF6B4A" />
+                    <item android:offset="1" android:color="#FFD32F2F" />
+                </gradient>
+            </aapt:attr>
+            <aapt:attr name="android:strokeColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="150"
+                    android:startY="84"
+                    android:endX="150"
+                    android:endY="385">
+                    <item android:offset="0" android:color="#FFFF6B4A" />
+                    <item android:offset="1" android:color="#FFD32F2F" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <group android:translateY="12">
+            <path
+                android:pathData="M270 135 L215 215 L255 215 L242 285 L300 195 L260 195 Z"
+                android:fillColor="#000000"
+                android:fillAlpha="0.3"
+                android:strokeColor="#000000"
+                android:strokeAlpha="0.3"
+                android:strokeWidth="12"
+                android:strokeLineJoin="round" />
+        </group>
+        <path
+            android:pathData="M270 135 L215 215 L255 215 L242 285 L300 195 L260 195 Z"
+            android:strokeWidth="8"
+            android:strokeLineJoin="round">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="215"
+                    android:startY="135"
+                    android:endX="215"
+                    android:endY="285">
+                    <item android:offset="0" android:color="#FFFFE873" />
+                    <item android:offset="1" android:color="#FFF29C11" />
+                </gradient>
+            </aapt:attr>
+            <aapt:attr name="android:strokeColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="215"
+                    android:startY="135"
+                    android:endX="215"
+                    android:endY="285">
+                    <item android:offset="0" android:color="#FFFFE873" />
+                    <item android:offset="1" android:color="#FFF29C11" />
+                </gradient>
+            </aapt:attr>
+        </path>
     </group>
 </vector>

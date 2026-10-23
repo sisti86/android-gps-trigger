@@ -17,8 +17,8 @@ android {
         // Deliberately 28: apps targeting Android 9 or lower may still toggle Wi-Fi
         // through WifiManager.setWifiEnabled(). Fine for sideloading, not for the Play Store.
         targetSdk = 28
-        versionCode = 2
-        versionName = "0.1.2"
+        versionCode = 3
+        versionName = "0.1.3"
     }
 
     buildTypes {

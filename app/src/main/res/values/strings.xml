@@ -9,6 +9,13 @@
     <string name="inside">Inside</string>
     <string name="disabled">Disabled</string>
 
+    <!-- Theme -->
+    <string name="theme_title">Theme</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="close">Close</string>
+
     <!-- Setup -->
     <string name="setup_title">Setup needed</string>
     <string name="perm_location_title">Location access</string>
