@@ -34,6 +34,12 @@
     <string name="change_location">Change location</string>
     <string name="radius_value">Radius: %d m</string>
     <string name="zone_enabled">Zone enabled</string>
+    <string name="schedule_title">Schedule</string>
+    <string name="active_days">Active on</string>
+    <string name="no_days_selected">Select at least one day.</string>
+    <string name="check_interval">Location check frequency</string>
+    <string name="check_interval_hint">Longer intervals save battery, but entering or leaving the zone may be noticed up to that much later.</string>
+    <string name="minutes_value" translatable="false">%d min</string>
     <string name="actions_title">When I enter this zone</string>
     <string name="ring_volume">Ringtone volume</string>
     <string name="notification_volume">Notification volume</string>
@@ -76,6 +82,8 @@
     <string name="summary_wifi_on">Wi‑Fi on</string>
     <string name="summary_wifi_off">Wi‑Fi off</string>
     <string name="summary_none">No actions</string>
+    <string name="summary_every_day">Every day</string>
+    <string name="summary_check_every">check every %d min</string>
 
     <!-- Notifications -->
     <string name="channel_zone_events">Zone events</string>

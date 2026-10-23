@@ -15,9 +15,12 @@ import com.gpstrigger.data.ZoneStore
  */
 object ZoneEngine {
 
+    /** [ignoreSchedule] lets the "simulate" button work on days the zone is off. */
     @Synchronized
-    fun enter(context: Context, zoneId: String) {
-        val zone = ZoneStore.zone(zoneId)?.takeIf { it.enabled } ?: return
+    fun enter(context: Context, zoneId: String, ignoreSchedule: Boolean = false) {
+        val zone = ZoneStore.zone(zoneId)
+            ?.takeIf { it.enabled && (ignoreSchedule || it.isScheduledOn()) }
+            ?: return
         val state = ZoneStore.active.value
         if (zoneId in state.activeZoneIds) return
 
@@ -55,6 +58,15 @@ object ZoneEngine {
 
         val ok = DeviceSettings(context).apply(restored)
         if (notify) Notifications.zoneEvent(context, zone, entered = false, ok)
+    }
+
+    /** Leaves the active zones that are not scheduled for today, e.g. right after midnight. */
+    @Synchronized
+    fun leaveUnscheduledZones(context: Context) {
+        ZoneStore.active.value.activeZoneIds
+            .mapNotNull(ZoneStore::zone)
+            .filterNot { it.isScheduledOn() }
+            .forEach { exit(context, it, notify = false) }
     }
 
     @Synchronized

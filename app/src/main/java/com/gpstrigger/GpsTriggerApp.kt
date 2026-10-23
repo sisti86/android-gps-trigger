@@ -3,6 +3,7 @@ package com.gpstrigger
 import android.app.Application
 import com.gpstrigger.data.ZoneStore
 import com.gpstrigger.engine.Notifications
+import com.gpstrigger.geofence.DayChangeReceiver
 import com.gpstrigger.geofence.ResyncWorker
 import org.osmdroid.config.Configuration
 import java.io.File
@@ -13,6 +14,7 @@ class GpsTriggerApp : Application() {
         ZoneStore.init(this)
         Notifications.createChannel(this)
         ResyncWorker.schedulePeriodic(this)
+        DayChangeReceiver.schedule(this)
 
         Configuration.getInstance().apply {
             load(this@GpsTriggerApp, getSharedPreferences("osmdroid", MODE_PRIVATE))

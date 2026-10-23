@@ -45,6 +45,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.gpstrigger.PermissionState
 import com.gpstrigger.Permissions
 import com.gpstrigger.R
+import com.gpstrigger.data.ALL_DAYS
 import com.gpstrigger.data.RingerSetting
 import com.gpstrigger.data.Zone
 import com.gpstrigger.data.ZoneActions
@@ -138,6 +139,13 @@ private fun ZoneCard(zone: Zone, inside: Boolean, onClick: () -> Unit, onToggle:
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 4.dp),
                 )
+                if (zone.enabled) {
+                    Text(
+                        text = scheduleSummary(LocalContext.current, zone),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
             Switch(checked = zone.enabled, onCheckedChange = onToggle)
         }
@@ -162,6 +170,16 @@ private fun actionsSummary(context: Context, actions: ZoneActions): String {
         }
     }
     return parts.joinToString(" · ").ifEmpty { context.getString(R.string.summary_none) }
+}
+
+private fun scheduleSummary(context: Context, zone: Zone): String {
+    val locale = context.resources.configuration.locales[0]
+    val days = if (zone.activeDays == ALL_DAYS) {
+        context.getString(R.string.summary_every_day)
+    } else {
+        weekDays(locale).filter { it.value in zone.activeDays }.joinToString(" ") { it.shortName(locale) }
+    }
+    return days + " · " + context.getString(R.string.summary_check_every, zone.checkIntervalMinutes)
 }
 
 @Composable

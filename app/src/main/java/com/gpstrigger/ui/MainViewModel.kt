@@ -91,7 +91,7 @@ class MainViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun simulate(enter: Boolean) {
         val zone = original ?: return
-        if (enter) ZoneEngine.enter(app, zone.id) else ZoneEngine.exit(app, zone)
+        if (enter) ZoneEngine.enter(app, zone.id, ignoreSchedule = true) else ZoneEngine.exit(app, zone)
     }
 
     fun sync() {

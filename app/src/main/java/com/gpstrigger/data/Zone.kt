@@ -1,9 +1,16 @@
 package com.gpstrigger.data
 
 import kotlinx.serialization.Serializable
+import java.time.LocalDate
 import java.util.UUID
 
 const val DEFAULT_RADIUS_METERS = 150f
+
+/** ISO days of the week: 1 = Monday … 7 = Sunday. */
+val ALL_DAYS: Set<Int> = (1..7).toSet()
+
+val CHECK_INTERVALS_MINUTES = listOf(1, 10, 20, 30, 60)
+const val DEFAULT_CHECK_INTERVAL_MINUTES = 1
 
 @Serializable
 enum class RingerSetting { NORMAL, VIBRATE, SILENT }
@@ -49,8 +56,14 @@ data class Zone(
     val address: String? = null,
     val enabled: Boolean = true,
     val actions: ZoneActions = ZoneActions(),
+    /** ISO days of the week on which the zone triggers. */
+    val activeDays: Set<Int> = ALL_DAYS,
+    /** Maximum delay for Play Services to report entering or leaving; longer saves battery. */
+    val checkIntervalMinutes: Int = DEFAULT_CHECK_INTERVAL_MINUTES,
 ) {
     val hasLocation get() = !latitude.isNaN() && !longitude.isNaN()
+
+    fun isScheduledOn(date: LocalDate = LocalDate.now()) = date.dayOfWeek.value in activeDays
 }
 
 /**

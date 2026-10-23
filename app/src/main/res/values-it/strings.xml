@@ -32,6 +32,11 @@
     <string name="change_location">Cambia posizione</string>
     <string name="radius_value">Raggio: %d m</string>
     <string name="zone_enabled">Zona attiva</string>
+    <string name="schedule_title">Programmazione</string>
+    <string name="active_days">Attiva nei giorni</string>
+    <string name="no_days_selected">Seleziona almeno un giorno.</string>
+    <string name="check_interval">Frequenza controllo posizione</string>
+    <string name="check_interval_hint">Intervalli più lunghi fanno risparmiare batteria, ma l’ingresso o l’uscita dalla zona potrebbero essere rilevati con un ritardo fino a quel tempo.</string>
     <string name="actions_title">Quando entro in questa zona</string>
     <string name="ring_volume">Volume suoneria</string>
     <string name="notification_volume">Volume notifiche</string>
@@ -72,6 +77,8 @@
     <string name="summary_wifi_on">Wi‑Fi acceso</string>
     <string name="summary_wifi_off">Wi‑Fi spento</string>
     <string name="summary_none">Nessuna azione</string>
+    <string name="summary_every_day">Tutti i giorni</string>
+    <string name="summary_check_every">controllo ogni %d min</string>
 
     <!-- Notifications -->
     <string name="channel_zone_events">Eventi zone</string>

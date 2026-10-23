@@ -41,12 +41,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.gpstrigger.R
+import com.gpstrigger.data.CHECK_INTERVALS_MINUTES
+import com.gpstrigger.data.DEFAULT_CHECK_INTERVAL_MINUTES
 import com.gpstrigger.data.RingerSetting
 import com.gpstrigger.data.Zone
 import com.gpstrigger.engine.DeviceSettings
@@ -67,7 +70,7 @@ fun ZoneEditScreen(
 ) {
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     val actions = draft.actions
-    val canSave = draft.name.isNotBlank() && draft.hasLocation
+    val canSave = draft.name.isNotBlank() && draft.hasLocation && draft.activeDays.isNotEmpty()
 
     Scaffold(
         topBar = {
@@ -136,6 +139,24 @@ fun ZoneEditScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.zone_enabled), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
                 Switch(checked = draft.enabled, onCheckedChange = { onChange(draft.copy(enabled = it)) })
+            }
+
+            HorizontalDivider()
+            Text(stringResource(R.string.schedule_title), style = MaterialTheme.typography.titleMedium)
+
+            DaysSetting(draft.activeDays) { onChange(draft.copy(activeDays = it)) }
+            Column {
+                ChoiceSetting(
+                    label = stringResource(R.string.check_interval),
+                    options = CHECK_INTERVALS_MINUTES.map { it to stringResource(R.string.minutes_value, it) },
+                    selected = draft.checkIntervalMinutes,
+                    onSelect = { onChange(draft.copy(checkIntervalMinutes = it ?: DEFAULT_CHECK_INTERVAL_MINUTES)) },
+                )
+                Text(
+                    stringResource(R.string.check_interval_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             HorizontalDivider()
@@ -241,6 +262,34 @@ private fun VolumeSetting(label: Int, stream: Int, value: Int?, onChange: (Int?)
                     modifier = Modifier.padding(start = 12.dp),
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun DaysSetting(selected: Set<Int>, onChange: (Set<Int>) -> Unit) {
+    val locale = LocalConfiguration.current.locales[0]
+    val days = remember(locale) { weekDays(locale) }
+
+    Column {
+        Text(stringResource(R.string.active_days), style = MaterialTheme.typography.bodyLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            days.forEach { day ->
+                val iso = day.value
+                FilterChip(
+                    selected = iso in selected,
+                    onClick = { onChange(if (iso in selected) selected - iso else selected + iso) },
+                    label = { Text(day.shortName(locale)) },
+                )
+            }
+        }
+        if (selected.isEmpty()) {
+            Text(
+                stringResource(R.string.no_days_selected),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
         }
     }
 }

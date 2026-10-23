@@ -10,6 +10,11 @@ Per ogni zona puoi impostare:
 - modalità audio (suono, vibrazione o silenzioso)
 - Wi‑Fi acceso o spento
 
+Per ogni zona scegli anche:
+
+- **In quali giorni della settimana è attiva.** Negli altri giorni l'ingresso viene ignorato.
+- **La frequenza di controllo della posizione:** 1, 10, 20, 30 o 60 minuti.
+
 La posizione si sceglie su una mappa OpenStreetMap, toccando la mappa o cercando un indirizzo. Non serve nessuna API key.
 
 L'interfaccia è in inglese, e in italiano se il telefono è impostato in italiano.
@@ -53,7 +58,15 @@ Consigliato: in Impostazioni → App → GPS Trigger → Batteria scegli **"Senz
 - **Ingresso.** Quando entri in una zona, l'app salva lo stato attuale del telefono e applica le impostazioni della zona.
 - **Uscita.** Quando esci, ripristina solo le impostazioni che la zona aveva cambiato.
   - Con zone sovrapposte, prevale l'ultima zona in cui sei entrato.
-- **Prova senza muoverti.** Nella schermata di modifica di una zona ci sono i pulsanti "Simula ingresso" e "Simula uscita".
+- **Frequenza di controllo.**
+  - È il ritardo massimo con cui Play Services segnala ingresso e uscita (`setNotificationResponsiveness`).
+  - Intervalli più lunghi fanno risparmiare batteria, ma vale sia per l'ingresso sia per l'uscita.
+  - L'app non interroga mai il GPS per conto suo.
+- **Giorni della settimana.**
+  - Poco dopo mezzanotte l'app ricontrolla le zone.
+  - Se sei dentro una zona e il nuovo giorno non è attivo, ripristina le impostazioni precedenti.
+  - Se invece il nuovo giorno è attivo e sei dentro, applica le impostazioni della zona.
+- **Prova senza muoverti.** Nella schermata di modifica di una zona ci sono i pulsanti "Simula ingresso" e "Simula uscita". "Simula ingresso" funziona anche nei giorni in cui la zona non è attiva.
 - **Mappa e indirizzi.**
   - Mappa: tile OpenStreetMap, servono dati mobili o Wi‑Fi.
   - Ricerca indirizzi: usa il Geocoder di Android, quindi niente chiave.

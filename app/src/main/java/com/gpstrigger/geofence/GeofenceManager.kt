@@ -13,6 +13,7 @@ import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 import com.gpstrigger.Permissions
 import com.gpstrigger.data.ZoneStore
+import com.gpstrigger.engine.ZoneEngine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
@@ -34,10 +35,12 @@ object GeofenceManager {
     /**
      * Replaces all registered geofences with the enabled zones. The initial triggers make
      * Play Services report right away whether the device is inside or outside each zone,
-     * which also fixes zones still marked active after missed events.
+     * which also fixes zones still marked active after missed events and enters zones
+     * whose scheduled day has just started.
      */
     @SuppressLint("MissingPermission")
     suspend fun sync(context: Context): SyncResult = mutex.withLock {
+        ZoneEngine.leaveUnscheduledZones(context)
         if (!Permissions.hasFineLocation(context)) return SyncResult.NO_PERMISSION
         val client = LocationServices.getGeofencingClient(context)
         val geofences = ZoneStore.zones.value.filter { it.enabled }.map { zone ->
@@ -46,6 +49,7 @@ object GeofenceManager {
                 .setCircularRegion(zone.latitude, zone.longitude, zone.radiusMeters)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+                .setNotificationResponsiveness(zone.checkIntervalMinutes * 60_000)
                 .build()
         }
         try {
