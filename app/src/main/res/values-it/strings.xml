@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Zone list -->
+    <string name="zones_title">Zone</string>
+    <string name="add_zone">Aggiungi zona</string>
+    <string name="no_zones">Nessuna zona. Tocca + per aggiungere un luogo in cui il telefono deve cambiare impostazioni.</string>
+    <string name="inside">Dentro</string>
+    <string name="disabled">Disattivata</string>
+
+    <!-- Setup -->
+    <string name="setup_title">Configurazione necessaria</string>
+    <string name="perm_location_title">Accesso alla posizione</string>
+    <string name="perm_location_desc">Serve per sapere quando entri o esci da una zona.</string>
+    <string name="perm_background_title">Consenti la posizione sempre</string>
+    <string name="perm_background_desc">In Impostazioni apri Autorizzazioni → Posizione e scegli “Consenti sempre”, altrimenti le zone funzionano solo con l’app aperta.</string>
+    <string name="perm_location_off_title">La posizione è disattivata</string>
+    <string name="perm_location_off_desc">Attiva la posizione per poter rilevare le zone.</string>
+    <string name="perm_dnd_title">Accesso a Non disturbare</string>
+    <string name="perm_dnd_desc">Serve per attivare la modalità silenziosa e per cambiare i volumi quando Non disturbare è attivo.</string>
+    <string name="perm_notifications_title">Notifiche (facoltative)</string>
+    <string name="perm_notifications_desc">Ricevi una notifica quando entri o esci da una zona.</string>
+    <string name="action_grant">Consenti</string>
+    <string name="action_open_settings">Apri impostazioni</string>
+    <string name="action_turn_on">Attiva</string>
+    <string name="sync_error">Impossibile registrare le zone. Verifica che la posizione e Google Play Services siano disponibili.</string>
+
+    <!-- Zone editor -->
+    <string name="new_zone">Nuova zona</string>
+    <string name="edit_zone">Modifica zona</string>
+    <string name="zone_name">Nome</string>
+    <string name="location">Posizione</string>
+    <string name="change_location">Cambia posizione</string>
+    <string name="radius_value">Raggio: %d m</string>
+    <string name="zone_enabled">Zona attiva</string>
+    <string name="actions_title">Quando entro in questa zona</string>
+    <string name="ring_volume">Volume suoneria</string>
+    <string name="notification_volume">Volume notifiche</string>
+    <string name="call_volume">Volume in chiamata</string>
+    <string name="ringer_mode">Modalità audio</string>
+    <string name="wifi">Wi‑Fi</string>
+    <string name="no_change">Non cambiare</string>
+    <string name="ringer_normal">Suono</string>
+    <string name="ringer_vibrate">Vibrazione</string>
+    <string name="ringer_silent">Silenzioso</string>
+    <string name="wifi_on">Acceso</string>
+    <string name="wifi_off">Spento</string>
+    <string name="restore_hint">Quando esci dalla zona vengono ripristinate le impostazioni precedenti.</string>
+    <string name="save">Salva</string>
+    <string name="delete">Elimina</string>
+    <string name="delete_confirm_title">Eliminare la zona?</string>
+    <string name="delete_confirm_text">“%s” verrà rimossa.</string>
+    <string name="cancel">Annulla</string>
+    <string name="back">Indietro</string>
+    <string name="test_title">Prova</string>
+    <string name="simulate_enter">Simula ingresso</string>
+    <string name="simulate_exit">Simula uscita</string>
+
+    <!-- Map picker -->
+    <string name="pick_location_title">Scegli posizione</string>
+    <string name="search_hint">Cerca indirizzo</string>
+    <string name="search_no_results">Nessun risultato</string>
+    <string name="geocoder_unavailable">La ricerca degli indirizzi non è disponibile su questo dispositivo. Posiziona il segnaposto sulla mappa.</string>
+    <string name="my_location">La mia posizione</string>
+    <string name="map_hint">Tocca la mappa o trascina il segnaposto per impostare la posizione.</string>
+    <string name="confirm_location">Usa questa posizione</string>
+    <string name="clear">Cancella</string>
+
+    <!-- Summaries -->
+    <string name="summary_ring">Suoneria %d</string>
+    <string name="summary_notification">Notifiche %d</string>
+    <string name="summary_call">Chiamata %d</string>
+    <string name="summary_wifi_on">Wi‑Fi acceso</string>
+    <string name="summary_wifi_off">Wi‑Fi spento</string>
+    <string name="summary_none">Nessuna azione</string>
+
+    <!-- Notifications -->
+    <string name="channel_zone_events">Eventi zone</string>
+    <string name="notif_entered">Ingresso in %s</string>
+    <string name="notif_exited">Uscita da %s</string>
+    <string name="notif_applied">Impostazioni applicate</string>
+    <string name="notif_restored">Impostazioni precedenti ripristinate</string>
+    <string name="notif_partial">Alcune impostazioni non sono state modificate. Apri l’app per controllare le autorizzazioni.</string>
+</resources>
