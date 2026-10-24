@@ -11,10 +11,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".GpsTriggerApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
@@ -31,16 +33,21 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".check.LocationCheckService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
         <receiver
-            android:name=".geofence.GeofenceReceiver"
+            android:name=".check.CheckAlarmReceiver"
             android:exported="false" />
 
         <receiver
-            android:name=".geofence.DayChangeReceiver"
+            android:name=".check.DayChangeReceiver"
             android:exported="false" />
 
         <receiver
-            android:name=".geofence.BootReceiver"
+            android:name=".check.BootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

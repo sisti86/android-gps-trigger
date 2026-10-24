@@ -17,7 +17,7 @@ Per ogni zona scegli anche:
 - **In quali giorni della settimana è attiva.** Negli altri giorni l'ingresso viene ignorato.
 - **La frequenza di controllo della posizione:** 1, 10, 20, 30 o 60 minuti.
 
-La posizione si sceglie su una mappa OpenStreetMap, toccando la mappa o cercando un indirizzo. Non serve nessuna API key.
+La posizione si sceglie su una mappa OpenStreetMap, toccando la mappa o usando la posizione GPS attuale. Non serve nessuna API key e l'app non usa Google Play Services.
 
 L'interfaccia è in inglese, e in italiano se il telefono è impostato in italiano.
 
@@ -62,24 +62,42 @@ Consigliato: in Impostazioni → App → GPS Trigger → Batteria scegli **"Senz
 
 ## Come funziona
 
-- **Rilevamento delle zone.** Usa il geofencing di Google Play Services, che consuma poca batteria.
-  - L'evento può arrivare con un ritardo di qualche minuto.
-  - Un raggio di almeno 100–150 m dà risultati più affidabili.
+- **Rilevamento delle zone.** L'app legge la posizione **solo dal GPS satellitare**.
+  - A ogni controllo un breve servizio accende il GPS, legge la posizione e calcola la distanza da ogni zona.
+  - Dura al massimo 60 secondi e mostra la notifica "Controllo posizione…".
+  - Il provider "rete" (Wi‑Fi e celle) non viene usato, perché su quasi tutti i telefoni è di Google.
+- **Raggio.**
+  - Va da 25 m a 2000 m.
+  - Con 25 o 50 m l'app mostra un avviso, perché la precisione del GPS è spesso di 20–50 m. Un raggio di almeno 100 m dà risultati più affidabili.
+  - Per uscire da una zona la posizione deve risultare fuori anche tenendo conto dell'errore del GPS, così una lettura imprecisa vicino al bordo non fa entrare e uscire di continuo.
 - **Ingresso.** Quando entri in una zona, l'app salva lo stato attuale del telefono e applica le impostazioni della zona.
 - **Uscita.** Quando esci, ripristina solo le impostazioni che la zona aveva cambiato.
   - Con zone sovrapposte, prevale l'ultima zona in cui sei entrato.
 - **Frequenza di controllo.**
-  - È il ritardo massimo con cui Play Services segnala ingresso e uscita (`setNotificationResponsiveness`).
-  - Intervalli più lunghi fanno risparmiare batteria, ma vale sia per l'ingresso sia per l'uscita.
-  - L'app non interroga mai il GPS per conto suo.
+  - La posizione viene controllata con la frequenza più alta tra le zone attive oggi.
+  - Intervalli più lunghi fanno risparmiare batteria, ma ingresso e uscita vengono rilevati più tardi.
+  - Se nessuna zona è attiva oggi, non viene fatto nessun controllo.
+  - Con il telefono fermo e lo schermo spento (modalità Doze), Android lascia partire i controlli al massimo circa ogni 9 minuti, anche se hai scelto 1 minuto.
 - **Giorni della settimana.**
   - Poco dopo mezzanotte l'app ricontrolla le zone.
   - Se sei dentro una zona e il nuovo giorno non è attivo, ripristina le impostazioni precedenti.
   - Se invece il nuovo giorno è attivo e sei dentro, applica le impostazioni della zona.
+- **Quando parte un controllo, oltre agli orari pianificati.**
+  - All'apertura dell'app.
+  - Quando salvi, attivi o disattivi una zona.
+  - Dopo un riavvio del telefono o un aggiornamento dell'app.
 - **Prova senza muoverti.** Nella schermata di modifica di una zona ci sono i pulsanti "Simula ingresso" e "Simula uscita". "Simula ingresso" funziona anche nei giorni in cui la zona non è attiva.
-- **Mappa e indirizzi.**
-  - Mappa: tile OpenStreetMap, servono dati mobili o Wi‑Fi.
-  - Ricerca indirizzi: usa il Geocoder di Android, quindi niente chiave.
+
+## Privacy
+
+L'app non raccoglie dati di utilizzo e non contiene librerie di analytics, crash reporting, pubblicità o Google Play Services. Zone e impostazioni restano solo sul telefono, e il backup Android su cloud è disattivato.
+
+L'unico traffico di rete sono i **tile della mappa**, scaricati da `tile.openstreetmap.org` solo mentre scegli una posizione. I server di OpenStreetMap ricevono il tuo indirizzo IP e l'area della mappa che stai guardando. I tile restano poi in cache sul telefono.
+
+Al di fuori del controllo dell'app:
+
+- **A‑GPS.** Il sistema operativo può scaricare da solo dati di assistenza GPS, per esempio dal tuo operatore o da Google, per trovare prima i satelliti.
+- **Precisione della posizione di Google.** Se nelle impostazioni Android è attiva, il telefono invia a Google scansioni Wi‑Fi e celle per tutte le app. Puoi disattivarla in Impostazioni → Posizione → Servizi di geolocalizzazione → Precisione della posizione di Google. L'app funziona anche senza, perché usa solo il GPS.
 
 ## Perché targetSdk 28
 
@@ -94,4 +112,6 @@ Su Android 15 l'app si installa e funziona normalmente. Le conseguenze sono due:
 
 - **Suoneria e notifiche collegate.** Su alcuni telefoni il volume delle notifiche è legato a quello della suoneria, e cambiarne uno cambia anche l'altro. È un comportamento del produttore.
 - **Wi‑Fi con modalità aereo.** Se la modalità aereo è attiva, Android può ignorare la richiesta di accendere il Wi‑Fi.
-- **Zone perse.** Dopo un riavvio o un aggiornamento le zone vengono registrate di nuovo in automatico. Lo stesso succede ogni 6 ore e a ogni apertura dell'app.
+- **GPS al chiuso.** Dentro gli edifici il GPS può non trovare i satelliti. In quel caso il controllo viene saltato e lo stato delle zone resta com'era fino al controllo successivo.
+- **Batteria.** Ogni controllo accende il GPS per qualche secondo, fino a 60. Con un intervallo di 1 minuto il GPS resta acceso quasi sempre. Da 10 minuti in su il consumo è contenuto.
+- **Arresto forzato.** Se fermi l'app da Impostazioni → App → "Forza interruzione", Android cancella i controlli pianificati. Riprendono alla successiva apertura dell'app o dopo un riavvio.

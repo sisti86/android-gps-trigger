@@ -2,42 +2,29 @@ package com.gpstrigger.ui
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.location.Address
-import androidx.compose.foundation.clickable
+import android.location.LocationManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -51,13 +38,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -67,7 +51,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.gpstrigger.Permissions
 import com.gpstrigger.R
 import com.gpstrigger.data.Zone
-import kotlinx.coroutines.delay
+import com.gpstrigger.engine.GpsFix
 import kotlinx.coroutines.launch
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -80,12 +64,18 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 private val DEFAULT_CENTER = GeoPoint(41.9, 12.5)
-private const val MIN_RADIUS = 100f
-private const val MAX_RADIUS = 2000f
-private const val RADIUS_STEP = 50f
+/** Selectable radii in metres: 25 and 50 for small places, then 100…2000 in steps of 50. */
+private val RADIUS_OPTIONS = listOf(25f, 50f) + (100..2000 step 50).map { it.toFloat() }
+
+/** Below this, zone detection gets unreliable because GPS accuracy is often 20–50 m. */
+private const val RELIABLE_RADIUS = 100f
+
+private fun nearestRadiusIndex(radius: Float) =
+    RADIUS_OPTIONS.indices.minBy { abs(RADIUS_OPTIONS[it] - radius) }
 
 /**
  * Turns the light OpenStreetMap tiles dark: inverts the colours, then rotates the hue by 180°
@@ -126,44 +116,34 @@ fun MapPickerScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val keyboard = LocalSoftwareKeyboardController.current
 
     var point by remember {
         mutableStateOf(if (initial.hasLocation) GeoPoint(initial.latitude, initial.longitude) else null)
     }
     var radius by remember { mutableFloatStateOf(initial.radiusMeters) }
+    // Kept only for zones saved by older versions; no address lookups are made any more.
     var address by remember { mutableStateOf(initial.address) }
     var centerRequest by remember { mutableStateOf<CenterRequest?>(null) }
-    var query by remember { mutableStateOf("") }
-    var results by remember { mutableStateOf<List<Address>?>(null) }
-    var searching by remember { mutableStateOf(false) }
+    var locating by remember { mutableStateOf(false) }
 
-    fun moveTo(target: GeoPoint, label: String? = null) {
+    fun moveTo(target: GeoPoint) {
         point = target
-        address = label
+        address = null
         centerRequest = CenterRequest(target)
     }
 
-    fun search() {
-        if (query.isBlank()) return
-        keyboard?.hide()
-        searching = true
+    fun locate() {
+        if (locating) return
+        locating = true
         scope.launch {
-            results = LocationLookup.search(context, query)
-            searching = false
+            GpsFix.obtain(context, timeoutMs = 30_000)?.let { moveTo(GeoPoint(it.latitude, it.longitude)) }
+            locating = false
         }
     }
 
     // New zone: start from the current position.
     LaunchedEffect(Unit) {
-        if (point == null) LocationLookup.currentLocation(context)?.let { moveTo(it) }
-    }
-    // Look up the address of a pin placed by hand.
-    LaunchedEffect(point) {
-        val p = point ?: return@LaunchedEffect
-        if (address != null) return@LaunchedEffect
-        delay(400)
-        address = LocationLookup.reverse(context, p)
+        if (point == null) locate()
     }
 
     Scaffold(
@@ -186,67 +166,21 @@ fun MapPickerScreen(
                 onPointChange = {
                     point = it
                     address = null
-                    results = null
                 },
                 modifier = Modifier.fillMaxSize(),
             )
 
-            Column(Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(12.dp)) {
-                Surface(shape = RoundedCornerShape(28.dp), shadowElevation = 4.dp) {
-                    TextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        placeholder = { Text(stringResource(R.string.search_hint)) },
-                        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                        trailingIcon = {
-                            when {
-                                searching -> CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
-                                query.isNotEmpty() -> IconButton(onClick = { query = ""; results = null }) {
-                                    Icon(Icons.Filled.Clear, contentDescription = stringResource(R.string.clear))
-                                }
-                            }
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { search() }),
-                        colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                results?.let { list ->
-                    Card(Modifier.padding(top = 8.dp).fillMaxWidth()) {
-                        Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState())) {
-                            when {
-                                !LocationLookup.geocoderAvailable -> MessageItem(R.string.geocoder_unavailable)
-                                list.isEmpty() -> MessageItem(R.string.search_no_results)
-                                else -> list.forEach { result ->
-                                    val label = LocationLookup.format(result)
-                                    ListItem(
-                                        headlineContent = { Text(label) },
-                                        modifier = Modifier.clickable {
-                                            moveTo(GeoPoint(result.latitude, result.longitude), label)
-                                            results = null
-                                        },
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().imePadding().navigationBarsPadding()) {
                 if (Permissions.hasFineLocation(context)) {
                     SmallFloatingActionButton(
-                        onClick = { scope.launch { LocationLookup.currentLocation(context)?.let { moveTo(it) } } },
+                        onClick = ::locate,
                         modifier = Modifier.align(Alignment.End).padding(horizontal = 12.dp),
                     ) {
-                        Icon(Icons.Filled.LocationOn, contentDescription = stringResource(R.string.my_location))
+                        if (locating) {
+                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                        } else {
+                            Icon(Icons.Filled.LocationOn, contentDescription = stringResource(R.string.my_location))
+                        }
                     }
                 }
                 Card(Modifier.fillMaxWidth().padding(12.dp)) {
@@ -265,11 +199,20 @@ fun MapPickerScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(top = 8.dp),
                         )
+                        // Above the slider: the card grows upwards, so the slider doesn't jump while dragging.
+                        if (radius < RELIABLE_RADIUS) {
+                            Text(
+                                stringResource(R.string.small_radius_warning),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                        // The slider moves over the option indexes, as the options aren't evenly spaced.
                         Slider(
-                            value = radius,
-                            onValueChange = { radius = (it / RADIUS_STEP).roundToInt() * RADIUS_STEP },
-                            valueRange = MIN_RADIUS..MAX_RADIUS,
-                            steps = ((MAX_RADIUS - MIN_RADIUS) / RADIUS_STEP).toInt() - 1,
+                            value = nearestRadiusIndex(radius).toFloat(),
+                            onValueChange = { radius = RADIUS_OPTIONS[it.roundToInt()] },
+                            valueRange = 0f..RADIUS_OPTIONS.lastIndex.toFloat(),
+                            steps = RADIUS_OPTIONS.size - 2,
                         )
                         Button(
                             onClick = { p?.let { onConfirm(it.latitude, it.longitude, radius, address) } },
@@ -283,11 +226,6 @@ fun MapPickerScreen(
             }
         }
     }
-}
-
-@Composable
-private fun MessageItem(text: Int) {
-    Text(stringResource(text), Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
 }
 
 /** OpenStreetMap view with a draggable pin and the zone circle. Tapping the map moves the pin. */
@@ -343,7 +281,12 @@ private fun OsmMap(
     }
     val copyright = remember { CopyrightOverlay(context) }
     val myLocation = remember {
-        MyLocationNewOverlay(GpsMyLocationProvider(context), mapView)
+        // GPS only: osmdroid would also use the network provider, which is usually Google's.
+        val provider = GpsMyLocationProvider(context).apply {
+            clearLocationSources()
+            addLocationSource(LocationManager.GPS_PROVIDER)
+        }
+        MyLocationNewOverlay(provider, mapView)
     }
 
     DisposableEffect(Unit) {

@@ -31,7 +31,6 @@
     <string name="action_grant">Grant</string>
     <string name="action_open_settings">Open settings</string>
     <string name="action_turn_on">Turn on</string>
-    <string name="sync_error">Zones could not be registered. Check that location and Google Play services are available.</string>
 
     <!-- Zone editor -->
     <string name="new_zone">New zone</string>
@@ -73,13 +72,10 @@
 
     <!-- Map picker -->
     <string name="pick_location_title">Choose location</string>
-    <string name="search_hint">Search address</string>
-    <string name="search_no_results">No results</string>
-    <string name="geocoder_unavailable">Address search isn’t available on this device. Place the pin on the map.</string>
     <string name="my_location">My location</string>
     <string name="map_hint">Tap the map or drag the pin to set the position.</string>
+    <string name="small_radius_warning">Under 100 m entering and leaving may be detected late or missed, because location accuracy is often 20–50 m.</string>
     <string name="confirm_location">Use this location</string>
-    <string name="clear">Clear</string>
 
     <!-- Summaries -->
     <string name="coordinates" translatable="false">%1$.5f, %2$.5f</string>
@@ -93,6 +89,8 @@
     <string name="summary_check_every">check every %d min</string>
 
     <!-- Notifications -->
+    <string name="channel_location_checks">Location checks</string>
+    <string name="notif_checking_location">Checking location…</string>
     <string name="channel_zone_events">Zone events</string>
     <string name="notif_entered">Entered %s</string>
     <string name="notif_exited">Left %s</string>

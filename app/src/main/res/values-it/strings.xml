@@ -29,7 +29,6 @@
     <string name="action_grant">Consenti</string>
     <string name="action_open_settings">Apri impostazioni</string>
     <string name="action_turn_on">Attiva</string>
-    <string name="sync_error">Impossibile registrare le zone. Verifica che la posizione e Google Play Services siano disponibili.</string>
 
     <!-- Zone editor -->
     <string name="new_zone">Nuova zona</string>
@@ -69,13 +68,10 @@
 
     <!-- Map picker -->
     <string name="pick_location_title">Scegli posizione</string>
-    <string name="search_hint">Cerca indirizzo</string>
-    <string name="search_no_results">Nessun risultato</string>
-    <string name="geocoder_unavailable">La ricerca degli indirizzi non è disponibile su questo dispositivo. Posiziona il segnaposto sulla mappa.</string>
     <string name="my_location">La mia posizione</string>
     <string name="map_hint">Tocca la mappa o trascina il segnaposto per impostare la posizione.</string>
+    <string name="small_radius_warning">Sotto i 100 m ingresso e uscita potrebbero essere rilevati in ritardo o non rilevati, perché la precisione della posizione è spesso di 20–50 m.</string>
     <string name="confirm_location">Usa questa posizione</string>
-    <string name="clear">Cancella</string>
 
     <!-- Summaries -->
     <string name="summary_ring">Suoneria %d</string>
@@ -88,6 +84,8 @@
     <string name="summary_check_every">controllo ogni %d min</string>
 
     <!-- Notifications -->
+    <string name="channel_location_checks">Controlli posizione</string>
+    <string name="notif_checking_location">Controllo posizione…</string>
     <string name="channel_zone_events">Eventi zone</string>
     <string name="notif_entered">Ingresso in %s</string>
     <string name="notif_exited">Uscita da %s</string>

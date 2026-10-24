@@ -22,7 +22,12 @@ class DeviceSettings(context: Context) {
             AudioManager.RINGER_MODE_VIBRATE -> RingerSetting.VIBRATE
             else -> RingerSetting.NORMAL
         },
-        wifiEnabled = wifi.isWifiEnabled,
+        // Count a Wi-Fi still switching on as on (and vice versa): a zone entered right after
+        // another one restored Wi-Fi must not capture the old state.
+        wifiEnabled = when (wifi.wifiState) {
+            WifiManager.WIFI_STATE_ENABLED, WifiManager.WIFI_STATE_ENABLING -> true
+            else -> false
+        },
     )
 
     fun volume(stream: Int): Int = audio.getStreamVolume(stream)

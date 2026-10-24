@@ -50,7 +50,7 @@ private fun GpsTriggerUi(vm: MainViewModel = viewModel()) {
     val themeMode by vm.themeMode.collectAsStateWithLifecycle()
 
     LifecycleResumeEffect(Unit) {
-        vm.sync()
+        vm.checkNow()
         onPauseOrDispose { }
     }
 
@@ -59,13 +59,12 @@ private fun GpsTriggerUi(vm: MainViewModel = viewModel()) {
         draft == null -> ZoneListScreen(
             zones = zones,
             activeIds = active.activeZoneIds,
-            syncResult = vm.syncResult,
             themeMode = themeMode,
             onThemeModeChange = vm::setThemeMode,
             onAdd = vm::newZone,
             onEdit = vm::edit,
             onToggle = vm::setEnabled,
-            onPermissionsChanged = vm::sync,
+            onPermissionsChanged = vm::checkNow,
         )
 
         vm.picking -> {

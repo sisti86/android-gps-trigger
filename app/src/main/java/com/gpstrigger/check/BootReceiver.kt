@@ -1,14 +1,14 @@
-package com.gpstrigger.geofence
+package com.gpstrigger.check
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
-/** Geofences are dropped on reboot and on app update, so register them again. */
+/** Alarms are dropped on reboot and on app update, so check right away and reschedule. */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
-            ResyncWorker.runNow(context)
+            LocationChecks.runNow(context)
         }
     }
 }

@@ -59,14 +59,12 @@ import com.gpstrigger.data.RingerSetting
 import com.gpstrigger.data.ThemeMode
 import com.gpstrigger.data.Zone
 import com.gpstrigger.data.ZoneActions
-import com.gpstrigger.geofence.SyncResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ZoneListScreen(
     zones: List<Zone>,
     activeIds: List<String>,
-    syncResult: SyncResult?,
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
     onAdd: () -> Unit,
@@ -107,7 +105,6 @@ fun ZoneListScreen(
             item {
                 SetupCard(
                     permissions = permissions,
-                    syncResult = syncResult,
                     onChanged = {
                         permissions = Permissions.read(context)
                         onPermissionsChanged()
@@ -245,14 +242,12 @@ private fun scheduleSummary(context: Context, zone: Zone): String {
 }
 
 @Composable
-private fun SetupCard(permissions: PermissionState, syncResult: SyncResult?, onChanged: () -> Unit) {
+private fun SetupCard(permissions: PermissionState, onChanged: () -> Unit) {
     val context = LocalContext.current
     val locationLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { onChanged() }
-    val showSyncError = permissions.fineLocation &&
-        (syncResult == SyncResult.ERROR || syncResult == SyncResult.LOCATION_UNAVAILABLE)
-    if (permissions.allRequiredGranted && permissions.notifications && !showSyncError) return
+    if (permissions.allRequiredGranted && permissions.notifications) return
 
     fun open(intent: Intent) = context.startActivity(intent)
 
@@ -291,9 +286,6 @@ private fun SetupCard(permissions: PermissionState, syncResult: SyncResult?, onC
                 SetupItem(R.string.perm_notifications_title, R.string.perm_notifications_desc, R.string.action_open_settings) {
                     open(Permissions.notificationSettingsIntent(context))
                 }
-            }
-            if (showSyncError && permissions.locationEnabled) {
-                Text(stringResource(R.string.sync_error), style = MaterialTheme.typography.bodyMedium)
             }
         }
     }

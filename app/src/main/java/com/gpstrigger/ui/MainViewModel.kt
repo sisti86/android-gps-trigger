@@ -5,15 +5,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
+import com.gpstrigger.check.LocationChecks
 import com.gpstrigger.data.AppSettings
 import com.gpstrigger.data.ThemeMode
 import com.gpstrigger.data.Zone
 import com.gpstrigger.data.ZoneStore
 import com.gpstrigger.engine.ZoneEngine
-import com.gpstrigger.geofence.GeofenceManager
-import com.gpstrigger.geofence.SyncResult
-import kotlinx.coroutines.launch
 
 class MainViewModel(private val app: Application) : AndroidViewModel(app) {
     val zones = ZoneStore.zones
@@ -24,8 +21,6 @@ class MainViewModel(private val app: Application) : AndroidViewModel(app) {
     var draft by mutableStateOf<Zone?>(null)
         private set
     var picking by mutableStateOf(false)
-        private set
-    var syncResult by mutableStateOf<SyncResult?>(null)
         private set
 
     /** The saved version of [draft], `null` for a new zone. */
@@ -69,12 +64,12 @@ class MainViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun save() {
         val zone = draft ?: return
-        // Leave the old version first so its settings get restored; the geofence
-        // initial trigger re-enters the zone with the new settings if still inside.
+        // Leave the old version first so its settings get restored; the location
+        // check right after re-enters the zone with the new settings if still inside.
         original?.let { ZoneEngine.exit(app, it, notify = false) }
         ZoneStore.upsert(zone)
         closeEditor()
-        sync()
+        checkNow()
     }
 
     fun delete() {
@@ -83,13 +78,13 @@ class MainViewModel(private val app: Application) : AndroidViewModel(app) {
             ZoneStore.delete(it.id)
         }
         closeEditor()
-        sync()
+        checkNow()
     }
 
     fun setEnabled(zone: Zone, enabled: Boolean) {
         if (!enabled) ZoneEngine.exit(app, zone, notify = false)
         ZoneStore.upsert(zone.copy(enabled = enabled))
-        sync()
+        checkNow()
     }
 
     fun simulate(enter: Boolean) {
@@ -101,7 +96,10 @@ class MainViewModel(private val app: Application) : AndroidViewModel(app) {
         AppSettings.setThemeMode(app, mode)
     }
 
-    fun sync() {
-        viewModelScope.launch { syncResult = GeofenceManager.sync(app) }
+    /** Runs a location check now, e.g. when the app is opened or a zone changes. */
+    fun checkNow() {
+        if (zones.value.any { it.enabled } || active.value.activeZoneIds.isNotEmpty()) {
+            LocationChecks.runNow(app)
+        }
     }
 }
