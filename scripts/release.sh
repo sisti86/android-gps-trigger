@@ -14,8 +14,10 @@ SIGNING_DIR="${SIGNING_DIR:-$HOME/.android/gps-trigger}"
 source "$SIGNING_DIR/signing.properties"
 export KEY_PASS OLD_KEY_PASS
 
-export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home}"
-SDK_DIR="$(sed -n 's/^sdk.dir=//p' local.properties)"
+if [ -z "${JAVA_HOME:-}" ] && [ -d /opt/homebrew/opt/openjdk@17 ]; then
+    export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+fi
+SDK_DIR="${ANDROID_HOME:-$(sed -n 's/^sdk.dir=//p' local.properties 2>/dev/null)}"
 BUILD_TOOLS="$SDK_DIR/build-tools/35.0.0"
 
 ./gradlew --quiet assembleRelease
