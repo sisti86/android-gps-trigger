@@ -17,15 +17,15 @@ android {
         // Deliberately 28: apps targeting Android 9 or lower may still toggle Wi-Fi
         // through WifiManager.setWifiEnabled(). Fine for sideloading, not for the Play Store.
         targetSdk = 28
-        versionCode = 4
-        versionName = "0.1.4"
+        versionCode = 5
+        versionName = "0.1.5"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Sideload-only app: sign release builds with the local debug key.
-            signingConfig = signingConfigs.getByName("debug")
+            // Left unsigned: scripts/release.sh signs it with the personal key and the
+            // rotation lineage from the old debug key, which Gradle can't do.
         }
     }
 

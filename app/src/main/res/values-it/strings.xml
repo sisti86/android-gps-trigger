@@ -14,6 +14,14 @@
     <string name="theme_dark">Scuro</string>
     <string name="close">Chiudi</string>
 
+    <!-- About -->
+    <string name="about_title">Informazioni</string>
+    <string name="about_version">Versione %s</string>
+    <string name="about_author">Autore: %s</string>
+    <string name="about_license">Licenza: %s</string>
+    <string name="about_privacy">GPS Trigger non raccoglie alcun dato. Vengono scaricati solo i tile della mappa, da OpenStreetMap, mentre scegli una posizione.</string>
+    <string name="about_signature">Certificato di firma (SHA-256)</string>
+
     <!-- Setup -->
     <string name="setup_title">Configurazione necessaria</string>
     <string name="perm_location_title">Accesso alla posizione</string>

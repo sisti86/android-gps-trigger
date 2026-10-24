@@ -20,6 +20,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -75,6 +76,7 @@ fun ZoneListScreen(
     val context = LocalContext.current
     var permissions by remember { mutableStateOf(Permissions.read(context)) }
     var showThemeDialog by rememberSaveable { mutableStateOf(false) }
+    var showAbout by rememberSaveable { mutableStateOf(false) }
     LifecycleResumeEffect(Unit) {
         permissions = Permissions.read(context)
         onPauseOrDispose { }
@@ -85,6 +87,9 @@ fun ZoneListScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.zones_title)) },
                 actions = {
+                    IconButton(onClick = { showAbout = true }) {
+                        Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.about_title))
+                    }
                     IconButton(onClick = { showThemeDialog = true }) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.theme_title))
                     }
@@ -132,6 +137,9 @@ fun ZoneListScreen(
         }
     }
 
+    if (showAbout) {
+        AboutDialog(onDismiss = { showAbout = false })
+    }
     if (showThemeDialog) {
         ThemeDialog(
             selected = themeMode,

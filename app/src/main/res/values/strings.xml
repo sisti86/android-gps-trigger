@@ -16,6 +16,14 @@
     <string name="theme_dark">Dark</string>
     <string name="close">Close</string>
 
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %s</string>
+    <string name="about_author">Author: %s</string>
+    <string name="about_license">License: %s</string>
+    <string name="about_privacy">GPS Trigger collects no data. Only map tiles are downloaded, from OpenStreetMap, while you choose a location.</string>
+    <string name="about_signature">Signing certificate (SHA-256)</string>
+
     <!-- Setup -->
     <string name="setup_title">Setup needed</string>
     <string name="perm_location_title">Location access</string>

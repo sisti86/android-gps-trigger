@@ -31,23 +31,58 @@ L'icona originale è in `art/gps-trigger-icon.svg`. Le versioni Android sono in 
 
 ## Compilare
 
-Serve JDK 17 e l'Android SDK (platform 35). Su questo Mac sono installati con Homebrew:
+Serve JDK 17 e l'Android SDK (platform 35, build-tools 35). Su questo Mac sono installati con Homebrew.
 
 ```sh
-export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
-./gradlew assembleRelease
+./scripts/release.sh
 ```
 
-L'APK viene creato in `app/build/outputs/apk/release/app-release.apk`.
+Lo script compila l'app e la firma con la chiave personale. L'APK viene creato in `app/build/outputs/apk/release/gps-trigger-<versione>.apk`.
 
-In alternativa puoi aprire la cartella con Android Studio.
+`./gradlew assembleRelease` da solo produce un APK non firmato, che Android non installa. La firma la fa `apksigner` dentro lo script, perché Gradle non supporta la rotazione della chiave.
 
-Le build sono firmate con la chiave di debug di questo Mac (`~/.android/debug.keystore`). Per installare un aggiornamento sopra una versione già installata serve la stessa chiave, quindi conserva quel file.
+## Firma e autore
+
+L'app è di **Stefano Sisti** ed è distribuita con licenza MIT (vedi [LICENSE](LICENSE)).
+
+Gli APK ufficiali sono firmati con questo certificato:
+
+```
+CN=Stefano Sisti, C=IT
+SHA-256: 88:CA:16:F7:2B:24:B5:FE:B6:90:B9:C1:84:1D:D7:40:DD:1E:4A:67:0B:4A:BD:A0:D0:A1:3F:DC:4E:8D:00:2B
+```
+
+Per verificare che un APK sia autentico:
+
+- **Dal Mac:**
+  ```sh
+  apksigner verify --print-certs gps-trigger-<versione>.apk
+  ```
+- **Dal telefono:** l'impronta è visibile nell'app, in Informazioni (icona ⓘ in alto nella lista zone).
+
+Se l'impronta è diversa, l'APK non viene da questo progetto. In ogni caso Android non lo installerebbe sopra la versione ufficiale.
+
+### Chiave di firma
+
+- **Dove si trova.** Sul Mac di sviluppo, fuori dal repository, in `~/.android/gps-trigger/`:
+  - `release.jks`: la chiave (RSA 4096, valida 30 anni)
+  - `signing.properties`: la password
+  - `lineage.bin`: la catena di rotazione
+- **Fai una copia di sicurezza di quella cartella.** Senza, nessun aggiornamento potrà più essere installato sopra l'app esistente: bisognerebbe disinstallarla e rifare le zone. Non metterla mai su GitHub.
+- **Rotazione.** Le versioni fino alla 0.1.4 erano firmate con la chiave di debug del Mac (`~/.android/debug.keystore`). Dalla 0.1.5 la firma include una "catena di rotazione" che dichiara il passaggio dalla vecchia chiave a quella personale, così l'aggiornamento si installa sopra la versione esistente e le zone restano. Un APK firmato solo con la vecchia chiave invece non viene più accettato.
+
+### Installazione fuori dal Play Store
+
+Dal 2027 Google richiederà che anche le app installate da APK sui telefoni con servizi Google provengano da sviluppatori registrati presso Google. Brasile, Indonesia, Singapore e Thailandia sono partiti a settembre 2026. Le alternative previste:
+
+- Un account gratuito "hobbista", fino a 20 dispositivi.
+- L'installazione via cavo con `adb install`, che resta esente.
+- Un percorso "avanzato" dalle Opzioni sviluppatore.
 
 ## Installare sul telefono
 
 1. Copia l'APK sul telefono e aprilo. Android chiederà di consentire l'installazione da quella sorgente.
-2. Puoi anche usare il cavo USB con il debug USB attivo: `adb install -r app-release.apk`.
+2. Puoi anche usare il cavo USB con il debug USB attivo: `adb install -r gps-trigger-<versione>.apk`.
 3. Se Play Protect segnala l'app come sconosciuta, scegli "Installa comunque".
 
 ## Primo avvio
